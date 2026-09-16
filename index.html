@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Gym Split</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#0b0e14',
+                        cardBg: '#131822',
+                        cardHover: '#1a202d',
+                        cardBorder: '#1f2636',
+                        modalBg: '#0f141f',
+                        modalCard: '#171e2c',
+                        modalCardBorder: '#232c3f',
+                        accentGold: '#e5ad35',
+                        accentGoldBg: '#272216'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.12);
+            border-radius: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .bg-subtle-grid {
+            background-image: radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+    </style>
+</head>
+<body class="bg-darkBg bg-subtle-grid text-slate-100 min-h-screen font-sans flex flex-col justify-between selection:bg-slate-700 selection:text-white antialiased">
+
+    <header class="w-full pt-8 pb-6 px-4 text-center border-b border-cardBorder/60 bg-gradient-to-b from-cardBg/90 to-transparent sticky top-0 z-20 backdrop-blur-md">
+        <div class="max-w-6xl mx-auto flex flex-col items-center justify-center">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800/80 border border-slate-700/70 text-xs font-mono tracking-widest text-slate-400 uppercase mb-2">
+                <i class="fa-solid fa-dumbbell text-amber-400"></i> Interactive Gym Split
+            </div>
+            <h1 class="text-3xl md:text-5xl font-black tracking-tight text-white uppercase italic">
+                Weekly Training Split
+            </h1>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-8 w-full flex-grow">
+        
+        <div class="mb-8 p-4 rounded-xl bg-cardBg/90 border border-cardBorder flex items-center justify-between gap-4 text-sm text-slate-300 shadow-xl">
+            <div class="flex items-center gap-3">
+                <span class="flex h-3 w-3 relative">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span>
+                </span>
+                <span class="font-medium text-slate-200">Click on any workout day block to open the full list of exercises, sets, and reps!</span>
+            </div>
+            <div class="hidden sm:block text-xs font-mono text-slate-400 bg-slate-800/80 px-2.5 py-1 rounded-md border border-slate-700/60">
+                7-DAY DASHBOARD
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5" id="workoutGrid">
+        </div>
+    </main>
+
+    <footer class="w-full border-t border-cardBorder bg-cardBg/90 mt-12 py-8 px-4">
+        <div class="max-w-6xl mx-auto space-y-6">
+            
+            <div class="p-5 md:p-6 rounded-2xl bg-gradient-to-r from-slate-900 via-cardBg to-slate-900 border border-amber-500/30 shadow-2xl relative overflow-hidden">
+                <div class="flex flex-col md:flex-row items-start md:items-center gap-4">
+                    <div class="p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl text-amber-400 shrink-0">
+                        <i class="fa-solid fa-triangle-exclamation text-2xl"></i>
+                    </div>
+                    
+                    <div class="space-y-1">
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                            Mandatory Training Guidance
+                        </h3>
+                        <p class="text-slate-300 text-sm leading-relaxed">
+                            <span class="text-amber-400 font-semibold">Warm-Up First:</span> Make sure to warm up thoroughly before starting your workout.<br>
+                            <span class="text-amber-400 font-semibold">Weight & Form:</span> Use as much weight as possible that you can execute with <span class="underline underline-offset-4 decoration-amber-400 font-bold text-white">GOOD FORM</span> for <span class="font-bold text-white underline underline-offset-4 decoration-amber-400">at least 8 reps</span> each set.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 border-t border-slate-800/80 pt-6 gap-2">
+                <div>
+                    <span class="font-bold text-slate-400">- DISCIPLINE BUILDS RESULTS</span> &bull; Personal Workout Log
+                </div>
+                <div>
+                    Click on the workout blocks for exercises breakdown.
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <div id="exerciseModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4 transition-all duration-300 opacity-0 pointer-events-none">
+        <div class="bg-modalBg border border-slate-800 w-full max-w-xl rounded-2xl shadow-2xl overflow-hidden transform scale-95 transition-all duration-300 max-h-[88vh] flex flex-col" id="modalContainer">
+            
+            <div class="p-6 border-b border-slate-800/80 flex items-center justify-between bg-cardBg/80">
+                <div class="flex items-center gap-3">
+                    <div id="modalIconContainer" class="w-11 h-11 rounded-xl bg-slate-800/90 border border-slate-700 flex items-center justify-center text-amber-400 text-xl">
+                        <i class="fa-solid fa-dumbbell"></i>
+                    </div>
+                    <div>
+                        <span id="modalDay" class="text-xs font-mono uppercase text-slate-400 tracking-wider">DAY</span>
+                        <h2 id="modalTitle" class="text-2xl font-black text-white italic tracking-wide uppercase">WORKOUT TITLE</h2>
+                    </div>
+                </div>
+                <button id="closeModalBtn" class="w-10 h-10 rounded-full bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition-colors">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <div class="p-6 overflow-y-auto custom-scrollbar flex-grow space-y-3" id="modalExerciseList">
+            </div>
+
+            <div class="p-4 border-t border-slate-800/80 bg-cardBg/60 text-xs text-slate-400 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-circle-info text-amber-400"></i>
+                    <span>Maintain good form for at least 8 reps.</span>
+                </div>
+                <button id="closeModalFooterBtn" class="px-5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-lg transition-colors">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const workoutData = [
+            {
+                id: "monday",
+                day: "MONDAY",
+                title: "REST",
+                icon: "fa-solid fa-bed",
+                quote: "REST IS PART OF THE PLAN.",
+                isRest: true,
+                exercises: []
+            },
+            {
+                id: "tuesday",
+                day: "TUESDAY",
+                title: "UPPER",
+                icon: "fa-solid fa-dumbbell",
+                quote: "SHOW UP FOR THE HARD DAYS.",
+                isRest: false,
+                exercises: [
+                    { name: "Incline Dumbbell Bench Press", sets: "3", reps: "8-12 reps" },
+                    { name: "Flat Dumbbell Press", sets: "3", reps: "8-12 reps" },
+                    { name: "Chest Press Machine", sets: "3", reps: "8-12 reps" },
+                    { name: "Pec Fly", sets: "3", reps: "12 reps" },
+                    { name: "DB Shoulder Press", sets: "3", reps: "8-12 reps" },
+                    { name: "Lateral Raises", sets: "3", reps: "12 reps" },
+                    { name: "Reverse Pec Fly", sets: "3", reps: "12 reps" },
+                    { name: "Pull-ups", sets: "3", reps: "8-12 reps" },
+                    { name: "Close-Grip Lat Pulldown", sets: "3", reps: "8-12 reps" },
+                    { name: "Seated Cable Row", sets: "3", reps: "8-12 reps" },
+                    { name: "Single-Arm Dumbbell Row", sets: "3", reps: "8-12 reps" },
+                    { name: "Cable Bicep Curl (Bar)", sets: "3", reps: "12 reps" },
+                    { name: "Single-Arm Bicep Curls", sets: "3", reps: "12 reps" },
+                    { name: "Preacher Curls Machine", sets: "3", reps: "8-12 reps" },
+                    { name: "Hammer Curls", sets: "3", reps: "To Failure" },
+                    { name: "Tricep Pushdown", sets: "3", reps: "12 reps" },
+                    { name: "Tricep Overhead Extension (V-Bar)", sets: "3", reps: "8-12 reps" },
+                    { name: "Tricep Dips", sets: "3", reps: "To Failure" }
+                ]
+            },
+            {
+                id: "wednesday",
+                day: "WEDNESDAY",
+                title: "LOWER",
+                icon: "fa-solid fa-person-running",
+                quote: "SMALL STEPS MAKE BIG CHANGES.",
+                isRest: false,
+                exercises: [
+                    { name: "Squats", sets: "3", reps: "8 reps" },
+                    { name: "Seated Leg Extensions", sets: "3", reps: "12 reps" },
+                    { name: "Lying Leg Curls", sets: "3", reps: "8-12 reps" },
+                    { name: "Abduction Legs", sets: "3", reps: "8-12 reps" },
+                    { name: "Adduction Legs", sets: "3", reps: "8-12 reps" },
+                    { name: "Calf Raises", sets: "3", reps: "8 reps" },
+                    { name: "Ab Crunch Machine", sets: "3", reps: "12 reps" },
+                    { name: "Ab Crunch Machine (Chest Pad)", sets: "3", reps: "8 reps" },
+                    { name: "Hanging Leg Raises", sets: "3", reps: "8-12 reps" }
+                ]
+            },
+            {
+                id: "thursday",
+                day: "THURSDAY",
+                title: "REST",
+                icon: "fa-solid fa-bed",
+                quote: "YOUR FUTURE SELF WILL THANK YOU.",
+                isRest: true,
+                exercises: []
+            },
+            {
+                id: "friday",
+                day: "FRIDAY",
+                title: "CHEST TRICEPS SHOULDERS",
+                icon: "fa-solid fa-hand-fist",
+                quote: "EFFORT TODAY. RESULTS TOMORROW.",
+                isRest: false,
+                exercises: [
+                    { name: "Incline Dumbbell Bench Press", sets: "3", reps: "8-12 reps" },
+                    { name: "Flat Dumbbell Press", sets: "3", reps: "8-12 reps" },
+                    { name: "Chest Press Machine", sets: "3", reps: "8-12 reps" },
+                    { name: "Pec Fly", sets: "3", reps: "12 reps" },
+                    { name: "DB Shoulder Press", sets: "3", reps: "8-12 reps" },
+                    { name: "Lateral Raises", sets: "3", reps: "12 reps" },
+                    { name: "Reverse Pec Fly", sets: "3", reps: "12 reps" },
+                    { name: "Tricep Pushdown", sets: "3", reps: "12 reps" },
+                    { name: "Tricep Overhead Extension (V-Bar)", sets: "3", reps: "8-12 reps" },
+                    { name: "Tricep Dips", sets: "3", reps: "To Failure" }
+                ]
+            },
+            {
+                id: "saturday",
+                day: "SATURDAY",
+                title: "BACK BICEPS",
+                icon: "fa-solid fa-child-reaching",
+                quote: "PROGRESS IS BUILT ON CONSISTENCY.",
+                isRest: false,
+                exercises: [
+                    { name: "Pull-ups", sets: "3", reps: "8-12 reps" },
+                    { name: "Close-Grip Lat Pulldown", sets: "3", reps: "8-12 reps" },
+                    { name: "Seated Cable Row", sets: "3", reps: "8-12 reps" },
+                    { name: "Single-Arm Dumbbell Row", sets: "3", reps: "8-12 reps" },
+                    { name: "Cable Bicep Curl (Bar)", sets: "3", reps: "12 reps" },
+                    { name: "Single-Arm Bicep Curls", sets: "3", reps: "12 reps" },
+                    { name: "Preacher Curls Machine", sets: "3", reps: "8-12 reps" },
+                    { name: "Hammer Curls", sets: "3", reps: "To Failure" }
+                ]
+            },
+            {
+                id: "sunday",
+                day: "SUNDAY",
+                title: "LEGS ABS",
+                icon: "fa-solid fa-dumbbell",
+                quote: "THE PAIN YOU FEEL TODAY BUILDS THE STRENGTH YOU NEED TOMORROW.",
+                isRest: false,
+                exercises: [
+                    { name: "Squats", sets: "3", reps: "8 reps" },
+                    { name: "Seated Leg Extensions", sets: "3", reps: "12 reps" },
+                    { name: "Lying Leg Curls", sets: "3", reps: "8-12 reps" },
+                    { name: "Abduction Legs", sets: "3", reps: "8-12 reps" },
+                    { name: "Adduction Legs", sets: "3", reps: "8-12 reps" },
+                    { name: "Calf Raises", sets: "3", reps: "8 reps" },
+                    { name: "Ab Crunch Machine", sets: "3", reps: "12 reps" },
+                    { name: "Ab Crunch Machine (Chest Pad)", sets: "3", reps: "8 reps" },
+                    { name: "Hanging Leg Raises", sets: "3", reps: "8-12 reps" }
+                ]
+            }
+        ];
+
+        const gridContainer = document.getElementById('workoutGrid');
+        const modal = document.getElementById('exerciseModal');
+        const modalContainer = document.getElementById('modalContainer');
+        const modalDay = document.getElementById('modalDay');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalIconContainer = document.getElementById('modalIconContainer');
+        const modalExerciseList = document.getElementById('modalExerciseList');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const closeModalFooterBtn = document.getElementById('closeModalFooterBtn');
+
+        function renderGrid() {
+            gridContainer.innerHTML = '';
+
+            workoutData.forEach(item => {
+                const card = document.createElement('div');
+                let cardClasses = "bg-cardBg border border-cardBorder rounded-2xl p-6 flex flex-col justify-between transition-all duration-300 relative group min-h-[220px]";
+                
+                if (item.isRest) {
+                    cardClasses += " opacity-60 hover:opacity-80";
+                } else {
+                    cardClasses += " hover:bg-cardHover hover:border-slate-600 hover:shadow-2xl hover:-translate-y-1 cursor-pointer";
+                }
+
+                card.className = cardClasses;
+
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-xs font-mono font-bold tracking-widest text-slate-400 uppercase">${item.day}</span>
+                            <div class="w-8 h-8 rounded-lg bg-slate-800/80 border border-slate-700/60 flex items-center justify-center text-slate-400 group-hover:text-amber-400 group-hover:border-amber-500/30 transition-colors">
+                                <i class="${item.icon}"></i>
+                            </div>
+                        </div>
+
+                        <h2 class="text-2xl font-black text-white uppercase italic tracking-tight mb-2 group-hover:text-amber-400 transition-colors">
+                            ${item.title}
+                        </h2>
+                    </div>
+
+                    <div class="mt-6 pt-4 border-t border-slate-800/60">
+                        <p class="text-xs font-mono text-slate-300 uppercase tracking-wide leading-relaxed">
+                            ${item.quote}
+                        </p>
+                        <div class="flex items-center justify-between mt-3">
+                            <span class="text-[10px] font-mono text-slate-500 tracking-wider">- DISCIPLINE BUILDS RESULTS</span>
+                            ${!item.isRest ? '<span class="text-[10px] font-mono text-amber-400/80 group-hover:text-amber-400 font-bold uppercase tracking-wider flex items-center gap-1">View <i class="fa-solid fa-arrow-right text-[9px]"></i></span>' : ''}
+                        </div>
+                    </div>
+                `;
+
+                if (!item.isRest) {
+                    card.addEventListener('click', () => openModal(item));
+                }
+
+                gridContainer.appendChild(card);
+            });
+        }
+
+        function openModal(item) {
+            modalDay.textContent = item.day;
+            modalTitle.textContent = item.title;
+            modalIconContainer.innerHTML = `<i class="${item.icon}"></i>`;
+            
+            modalExerciseList.innerHTML = '';
+
+            item.exercises.forEach((ex, index) => {
+                const exItem = document.createElement('div');
+                exItem.className = "bg-modalCard border border-modalCardBorder rounded-xl p-4 flex items-center justify-between gap-4 transition-all hover:border-slate-700 shadow-sm";
+                
+                exItem.innerHTML = `
+                    <div class="flex items-center gap-3.5">
+                        <div class="w-7 h-7 rounded-full bg-slate-800/90 border border-slate-700/80 flex items-center justify-center text-xs font-mono font-bold text-slate-400 shrink-0">
+                            ${index + 1}
+                        </div>
+                        <span class="font-bold text-slate-100 text-sm md:text-base tracking-wide">${ex.name}</span>
+                    </div>
+                    <div class="px-3.5 py-1.5 rounded-lg bg-accentGoldBg border border-amber-500/30 text-amber-400 text-xs font-mono font-bold tracking-wider shrink-0 shadow-inner">
+                        ${ex.sets} Sets &times; ${ex.reps}
+                    </div>
+                `;
+                
+                modalExerciseList.appendChild(exItem);
+            });
+
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0', 'pointer-events-none');
+                modalContainer.classList.remove('scale-95');
+                modalContainer.classList.add('scale-100');
+            }, 10);
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            modalContainer.classList.remove('scale-100');
+            modalContainer.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }, 300);
+        }
+
+        closeModalBtn.addEventListener('click', closeModal);
+        closeModalFooterBtn.addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        renderGrid();
+    </script>
+</body>
+</html>
